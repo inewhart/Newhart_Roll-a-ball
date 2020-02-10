@@ -9,13 +9,24 @@ public class PlayerController : MonoBehaviour
     public float speed;
     private Rigidbody rigid;
     public Text countText;
+    public Text winText; 
 
     // Start is called before the first frame update
     void Start()
     {
         Count = 0;
         rigid = GetComponent<Rigidbody>();
-        countText.text = "Count: " + countText.ToString();
+        setCountText();
+        winText.text = "";
+        Debug.Log(Count);
+    }
+    void setCountText()
+    {
+        countText.text = "Count: " + Count.ToString();
+        if(Count >= 16)
+        {
+            winText.text = "You Win!";
+        }
     }
     void OnTriggerEnter(Collider other)
     {
