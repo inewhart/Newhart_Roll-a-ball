@@ -6,15 +6,11 @@ using UnityEngine.SceneManagement;
 public static class Data
  {
      public static int score;
-     public static int lives;
-    //  public int getScore()
-    //  {
-
-    //  }
+     public static int lives = 3;
+     public static int scene;
  }
 public class PlayerController : MonoBehaviour
 {
- 
     public float speed;
     private Rigidbody rigid;
     public Text countText;
@@ -23,12 +19,16 @@ public class PlayerController : MonoBehaviour
     public GameObject ParticleFX;
     private GameObject score;
     private bool stop;
-    // Start is called before the first frame update
+    
+    // Start is called before the first frame update\
     void Start()
     {
-        
-        rigid = GetComponent<Rigidbody>();
+        if(Data.scene != 2)
+        {
+            Data.lives = 3;
+        }
         Data.lives = 3;
+        rigid = GetComponent<Rigidbody>();
         winText.text = "";
         stop = false;
     }
@@ -37,8 +37,10 @@ public class PlayerController : MonoBehaviour
         countText.text = "Count: " + Data.score.ToString();
         if(Data.score == 16 && stop == false)
         {
-            winText.text = "Standy by... \n  Teleporting shortly...";
+            winText.text = "Stand by... \n  Teleporting shortly...";
             StartCoroutine("sceneChange");
+            stop = true;
+            winText.text = "";
         }
         if(Data.score >= 32)
         {
@@ -51,18 +53,19 @@ public class PlayerController : MonoBehaviour
     }
     IEnumerator sceneChange() 
     {
-        stop = true;
-        winText.text = "";
+        Debug.Log("hi");
+        this.GetComponent<Rigidbody>().velocity = Vector3.zero;
         yield return new WaitForSeconds(3);
-
-        SceneManager.LoadScene("Scene2");
+        
+        this.transform.position = new Vector3(0,.5f,49);
+        
         
     }
     void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.CompareTag("PickUp"))
         {
-            Instantiate(ParticleFX,other.transform.position,other.transform.rotation).GetComponent<ParticleSystem>().Play();
+            Instantiate(ParticleFX,other.transform.position,new Quaternion(0,0,0,0)).GetComponent<ParticleSystem>().Play();
             // ParticleFX.GetComponent<ParticleSystem>().Play();
             other.gameObject.SetActive(false);
             Data.score++;
@@ -79,13 +82,13 @@ public class PlayerController : MonoBehaviour
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
         Vector3 movement = new Vector3(moveHorizontal,0.0f,moveVertical);
-        Debug.Log(Data.score);
+        // Debug.Log(Data.score);
         rigid.AddForce(movement*speed);
         setCountText();
         setLivesText();
         if(Data.lives <= 0)
         {
-
+            SceneManager.LoadScene("End");
         }
     }
     
